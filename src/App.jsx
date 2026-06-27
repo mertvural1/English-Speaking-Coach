@@ -33,6 +33,8 @@ export default function App(){
   const [listening, setListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [analysis, setAnalysis] = useState([])
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
   const recRef = useRef(null)
 
   const expected = prompt
@@ -54,6 +56,34 @@ export default function App(){
   useEffect(() => {
     loadPrompt()
   }, [])
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event) => {
+      event.preventDefault()
+      setDeferredPrompt(event)
+      setShowInstallBanner(true)
+    }
+
+    const handleAppInstalled = () => {
+      setDeferredPrompt(null)
+      setShowInstallBanner(false)
+    }
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    window.addEventListener('appinstalled', handleAppInstalled)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      window.removeEventListener('appinstalled', handleAppInstalled)
+    }
+  }, [])
+
+  function handleInstall(){
+    if(!deferredPrompt) return
+
+    deferredPrompt.prompt()
+    setShowInstallBanner(false)
+  }
 
   function handleStart(){
     const r = getRecognition()
@@ -104,6 +134,12 @@ export default function App(){
 
   return (
     <div className="min-h-screen bg-slate-50 py-5 px-4 sm:px-6 lg:px-8">
+      {showInstallBanner && (
+        <div className="mx-auto mb-4 flex max-w-7xl items-center justify-between rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800 shadow-sm">
+          <span>Would you like to install this app on your desktop?</span>
+          <button onClick={handleInstall} className="rounded-xl bg-indigo-600 px-3 py-2 font-semibold text-white transition hover:bg-indigo-700">Install</button>
+        </div>
+      )}
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
         <header className="rounded-3xl bg-indigo-600 p-4 md:p-6 text-white shadow-[0_28px_80px_rgba(99,102,241,0.12)]">
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight sm:text-4xl">English Speaking Coach</h1>
