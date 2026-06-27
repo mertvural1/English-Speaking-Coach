@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  color: #0f172a;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #f7f8fb;
+  color: #0f172a;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+
+::selection {
+  background: rgba(59,130,246,0.2);
+  color: #0f172a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
