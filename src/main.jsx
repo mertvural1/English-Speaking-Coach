@@ -6,12 +6,12 @@ import './styles.css'
 
 const updateSW = registerSW({
   onNeedRefresh() {
-    if (window.confirm('Yeni sürüm mevcut. Sayfayı yenileyerek güncellemek ister misiniz?')) {
+    if (window.confirm('A new version is available. Would you like to refresh and update now?')) {
       updateSW(true)
     }
   },
   onOfflineReady() {
-    console.log('PWA hazır: artık çevrimdışı kullanılabilir.')
+    console.log('PWA is ready: it can now be used offline.')
   }
 })
 
