@@ -2,7 +2,7 @@ export function normalizeText(s){
   return s
     .toLowerCase()
     .replace(/[\u2018\u2019\u201c\u201d]/g, "")
-    .replace(/[^a-z0-9\s']/g, '')
+    .replace(/[^(\p{L}|\p{N}|\s|')]/gu, '')
     .trim()
 }
 

@@ -1,43 +1,82 @@
 import React from 'react'
-import { Joyride, ACTIONS, EVENTS, STATUS } from 'react-joyride'
+import { Joyride, ACTIONS, STATUS } from 'react-joyride'
 
-const steps = [
-  {
-    target: 'body',
-    content: '👋 Welcome to English Speaking Coach! Practice your English pronunciation and get instant feedback. Follow the steps!',
-    disableBeacon: true,
-    placement: 'center',
-  },
-  {
-    target: '#tutorial-play-btn',
-    content: '🔊 Click "Play" first to hear how the sentence should be pronounced.',
-    placement: 'bottom',
-  },
-  {
-    target: '#tutorial-record-btn',
-    content: '🎤 Then click "Start Recording" and speak the phrase clearly!',
-    placement: 'top',
-  },
-  {
-    target: '#tutorial-stop-btn',
-    content: '⏹️ Click "Stop" when you finish speaking.',
-    placement: 'top',
-  },
-  {
-    target: '#tutorial-score',
-    content: '📊 Here you\'ll see your score and feedback about your pronunciation.',
-    placement: 'left',
-  },
-  {
-    target: 'body',
-    content: '✨ You\'re all set! Start practicing now. You can reopen this tutorial anytime by clicking the "?" button.',
-    placement: 'center',
-  },
-]
+const tutorialTexts = {
+  'en-US': [
+    '👋 Welcome to English Speaking Coach! Practice your English pronunciation and get instant feedback. Follow the steps!',
+    '🌐 Use the language selector to switch between English, German, or Russian practice.',
+    '🔊 Click "Play" first to hear how the sentence should be pronounced.',
+    '🎤 Then click "Start Recording" and speak the phrase clearly!',
+    '⏹️ Click "Stop" when you finish speaking.',
+    '📊 Here you\'ll see your score and feedback about your pronunciation.',
+    '✨ You\'re all set! Start practicing now. You can reopen this tutorial anytime by clicking the "?" button.',
+  ],
+  'de-DE': [
+    '👋 Willkommen beim Deutsch Sprachtrainer! Übe deine Aussprache und erhalte sofortiges Feedback. Folge den Schritten!',
+    '🌐 Verwende den Sprachwähler, um zwischen Englisch, Deutsch oder Russisch zu wechseln.',
+    '🔊 Klicke zuerst auf „Abspielen“, um zu hören, wie der Satz gesprochen werden sollte.',
+    '🎤 Dann klicke auf „Aufnahme starten“ und sprich den Satz deutlich!',
+    '⏹️ Klicke auf „Stopp“, wenn du fertig bist.',
+    '📊 Hier siehst du deine Punktzahl und das Feedback zur Aussprache.',
+    '✨ Du bist bereit! Starte jetzt mit dem Üben. Du kannst dieses Tutorial jederzeit erneut öffnen, indem du auf „?“ klickst.',
+  ],
+  'ru-RU': [
+    '👋 Добро пожаловать в русский тренер по речи! Практикуйте своё произношение и получайте мгновенный отклик. Следуйте шагам!',
+    '🌐 Используйте переключатель языка, чтобы выбрать практику на английском, немецком или русском.',
+    '🔊 Сначала нажмите «Воспроизвести», чтобы услышать, как должно звучать предложение.',
+    '🎤 Затем нажмите «Начать запись» и произносите фразу чётко!',
+    '⏹️ Нажмите «Стоп», когда закончите.',
+    '📊 Здесь вы увидите свой результат и отзыв о произношении.',
+    '✨ Всё готово! Начните практиковать. Вы можете открыть это руководство снова, нажав «?».',
+  ],
+}
 
-export default function Tutorial({ isOpen, onClose }) {
+function getSteps(language) {
+  const content = tutorialTexts[language] || tutorialTexts['en-US']
+
+  return [
+    {
+      target: 'body',
+      content: content[0],
+      disableBeacon: true,
+      placement: 'center',
+    },
+    {
+      target: '#language-select',
+      content: content[1],
+      placement: 'bottom',
+    },
+    {
+      target: '#tutorial-play-btn',
+      content: content[2],
+      placement: 'bottom',
+    },
+    {
+      target: '#tutorial-record-btn',
+      content: content[3],
+      placement: 'top',
+    },
+    {
+      target: '#tutorial-stop-btn',
+      content: content[3],
+      placement: 'top',
+    },
+    {
+      target: '#tutorial-score',
+      content: content[4],
+      placement: 'left',
+    },
+    {
+      target: 'body',
+      content: content[5],
+      placement: 'center',
+    },
+  ]
+}
+
+export default function Tutorial({ isOpen, onClose, language }) {
   const handleJoyrideCallback = (data) => {
-    const { status, action, type } = data
+    const { status, action } = data
 
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status) || action === ACTIONS.CLOSE) {
       onClose()
@@ -131,7 +170,7 @@ export default function Tutorial({ isOpen, onClose }) {
     <>
       <style>{joyrideStyles}</style>
       <Joyride
-        steps={steps}
+        steps={getSteps(language)}
         run={isOpen}
         continuous
         scrollToFirstStep
