@@ -3,8 +3,8 @@ import { normalizeText, compareWords } from './pronounceUtils'
 import { getPromptForLang } from './data/prompts'
 import Tutorial from './components/Tutorial'
 
-function getRandomFallbackPrompt(lang = 'en-US'){
-  const promptList = getPromptForLang(lang)
+function getRandomFallbackPrompt(lang = 'en-US', level = 1){
+  const promptList = getPromptForLang(lang, level)
   return promptList[Math.floor(Math.random() * promptList.length)]
 }
 
@@ -93,8 +93,11 @@ function getRecognition(lang = 'en-US'){
 }
 
 export default function App(){
-  const [prompt, setPrompt] = useState(() => getRandomFallbackPrompt('en-US'))
+  const [prompt, setPrompt] = useState(() => getRandomFallbackPrompt('en-US', 1))
   const [language, setLanguage] = useState('en-US')
+  const [level, setLevel] = useState(1)
+  const [levelMessage, setLevelMessage] = useState('')
+  const maxLevel = 10
   const [loadingPrompt, setLoadingPrompt] = useState(false)
   const [listening, setListening] = useState(false)
   const [transcript, setTranscript] = useState('')
@@ -115,18 +118,19 @@ export default function App(){
     speak(expected, language)
   }
 
-  function loadPrompt(lang = 'en-US'){
-    setPrompt(getRandomFallbackPrompt(lang))
+  function loadPrompt(lang = 'en-US', lvl = 1){
+    setPrompt(getRandomFallbackPrompt(lang, lvl))
   }
 
   function handleNext(){
-    loadPrompt(language)
+    loadPrompt(language, level)
     setTranscript('')
     setAnalysis([])
+    setLevelMessage('')
   }
 
   useEffect(() => {
-    loadPrompt(language)
+    loadPrompt(language, level)
     
     // İlk ziyarett öğreticiyi göster
     const hasSeenTutorial = localStorage.getItem('english-coach-tutorial-seen')
@@ -137,10 +141,16 @@ export default function App(){
   }, [])
 
   useEffect(() => {
-    loadPrompt(language)
+    loadPrompt(language, level)
     setTranscript('')
     setAnalysis([])
-  }, [language])
+  }, [language, level])
+
+  useEffect(() => {
+    if (!levelMessage) return
+    const timer = setTimeout(() => setLevelMessage(''), 3200)
+    return () => clearTimeout(timer)
+  }, [levelMessage])
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event) => {
@@ -231,11 +241,23 @@ export default function App(){
     if (currentScore === 100 && analysis.length > 0 && lastConfettiScore !== 100) {
       triggerConfetti()
       setLastConfettiScore(100)
+      if (level < maxLevel) {
+        const nextLevel = level + 1
+        setLevel(nextLevel)
+        setLevelMessage(`Level ${nextLevel} unlocked!`)
+        setTranscript('')
+        setAnalysis([])
+      } else {
+        setLevelMessage('Top level reached!')
+        loadPrompt(language, level)
+        setTranscript('')
+        setAnalysis([])
+      }
     }
     if (currentScore !== 100 && lastConfettiScore !== null) {
       setLastConfettiScore(null)
     }
-  }, [analysis, lastConfettiScore])
+  }, [analysis, lastConfettiScore, level, language])
 
   const correctCount = analysis.filter(a=>a.ok).length
   const score = analysis.length? Math.round((correctCount/analysis.length)*100):0
@@ -255,7 +277,10 @@ export default function App(){
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1">
               <h1 className="text-xl md:text-3xl font-semibold tracking-tight sm:text-4xl">{text.appName}</h1>
-              <p className="mt-1 md:mt-2 text-xs md:text-base text-indigo-100/90">{text.description}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/90">Level {level} / {maxLevel}</span>
+              </div>
+              <p className="mt-3 md:mt-2 text-xs md:text-base text-indigo-100/90">{text.description}</p>
             </div>
             <div className="flex items-center gap-3 sm:ml-4">
               <div className="relative flex items-center rounded-2xl border border-slate-200 bg-white px-3 py-2 text-slate-900 text-sm text-left">
@@ -309,6 +334,9 @@ export default function App(){
           </div>
         )}
         <main className="rounded-3xl bg-white p-4 md:p-6 shadow-[0_28px_80px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70">
+          {levelMessage && (
+            <div className="mb-4 rounded-3xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm">{levelMessage}</div>
+          )}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">{text.phrase}</p>

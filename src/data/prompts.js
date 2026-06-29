@@ -236,6 +236,14 @@ const promptSets = {
   'ru-RU': promptsRU,
 }
 
-export function getPromptForLang(lang = 'en-US'){
-  return promptSets[lang] ?? prompts
+function getLevelPrompts(promptList, level = 1){
+  const totalLevels = 10
+  const levelSize = Math.ceil(promptList.length / totalLevels)
+  const start = Math.min((Math.max(level, 1) - 1) * levelSize, promptList.length - 1)
+  return promptList.slice(start, start + levelSize)
+}
+
+export function getPromptForLang(lang = 'en-US', level = 1){
+  const promptList = promptSets[lang] ?? prompts
+  return getLevelPrompts(promptList, level)
 }
