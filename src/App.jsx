@@ -277,9 +277,6 @@ export default function App(){
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1">
               <h1 className="text-xl md:text-3xl font-semibold tracking-tight sm:text-4xl">{text.appName}</h1>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/90">Level {level} / {maxLevel}</span>
-              </div>
               <p className="mt-3 md:mt-2 text-xs md:text-base text-indigo-100/90">{text.description}</p>
             </div>
             <div className="flex items-center gap-3 sm:ml-4">
@@ -356,9 +353,12 @@ export default function App(){
               <p className="mt-3 min-h-[3rem] text-lg text-slate-900">{transcript || <span className="text-slate-400">{text.placeholder}</span>}</p>
             </div>
             <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-950 to-slate-900 p-4 text-white shadow-xl sm:justify-center lg:min-w-[220px] lg:flex-col lg:justify-center">
-              <div id="tutorial-score" className="text-left sm:text-center">
+              <div className="text-left sm:text-center">
                 <p className="text-sm uppercase text-slate-300">{text.score}</p>
                 <p className="mt-1 text-xl font-semibold sm:text-4xl">{score}%</p>
+                <div className="mt-3 rounded-3xl bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white/90">
+                  Level {level} / {maxLevel}
+                </div>
               </div>
               <div className="flex flex-1 justify-end gap-2 sm:justify-center lg:mt-3 lg:w-full">
                 <button id="tutorial-record-btn" onClick={handleStart} disabled={listening || !prompt} className="inline-flex flex-1 items-center justify-center rounded-2xl bg-emerald-500 px-3 py-2.5 text-xs md:text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 sm:min-w-[140px]">{text.startRecording}</button>
